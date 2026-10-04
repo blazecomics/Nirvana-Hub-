@@ -1,4 +1,90 @@
-Withdraw profits
-Admin token
-Unlock
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex,nofollow"><title>Nirvana Hub admin</title>
+<style>
+body{margin:0;background:#050505;color:#f6f4ee;font:16px/1.5 system-ui,sans-serif;padding:24px 18px 60px}main{max-width:460px;margin:0 auto}
+h1{font-size:22px;margin:0 0 4px}h2{font-size:18px;margin:34px 0 10px}
+label{display:block;color:#9b9a94;font-size:13px;margin:16px 0 6px}
+input{width:100%;box-sizing:border-box;font:500 18px system-ui;background:#151517;color:#f6f4ee;border:1px solid #2a2a2e;border-radius:12px;padding:14px}
+button{width:100%;margin-top:14px;font:700 16px system-ui;background:#ffc93c;color:#050505;border:0;border-radius:12px;padding:15px}
+button.g{background:transparent;color:#f6f4ee;border:1px solid #2a2a2e}button:disabled{opacity:.5}
+.m{margin-top:14px;min-height:22px;color:#ffc93c;white-space:pre-line}.e{color:#ff8a7a!important}
+.sum{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:12px 0}
+.sum div{background:#151517;border:1px solid #2a2a2e;border-radius:14px;padding:12px 14px}.sum b{display:block;font-size:22px}.sum span{font-size:12px;color:#9b9a94}
+.o{background:#151517;border:1px solid #2a2a2e;border-radius:16px;padding:14px;margin-bottom:10px}
+.o.bad{border-color:#ff8a7a;background:#2a1512}
+.top{display:flex;justify-content:space-between;align-items:center;gap:10px}.top b{font-size:18px}
+.pill{font:700 12px system-ui;padding:4px 10px;border-radius:99px;background:#2a2a2e;white-space:nowrap}
+.pill.delivered{background:#ffc93c;color:#050505}.pill.delivery_failed,.pill.amount_mismatch{background:#ff8a7a;color:#050505}
+.sm{font-size:13px;color:#9b9a94;margin-top:4px;word-break:break-all}.fix{font-size:14px;color:#ff8a7a;margin-top:6px}
+.mk{margin-top:10px;padding:10px;font-size:14px}
+.empty{color:#9b9a94;padding:10px 0}
+</style></head><body><main>
+<h1>Nirvana Hub admin</h1>
+<label for="t">Admin token</label><input id="t" type="password" autocomplete="off">
+<button id="c" type="button">Unlock</button>
+<div class="m" id="m0" role="status"></div>
+
+<div id="w" hidden>
+  <h2>Orders</h2>
+  <div class="sum" id="sm"></div>
+  <button class="g" id="rf" type="button">Refresh orders</button>
+  <div id="ol" style="margin-top:14px"></div>
+  <div class="sm">Shows your latest 50 orders. "Awaiting payment" means the customer started checkout but has not paid.</div>
+
+  <h2>Withdraw profits</h2>
+  <p id="d" class="sm"></p>
+  <label for="a">Amount (GH₵)</label><input id="a" type="number" inputmode="decimal" min="1" step="0.01">
+  <button id="s" type="button">Withdraw</button>
+  <div class="m" id="m" role="status"></div>
+</div>
+</main>
+<script>
+const $=i=>document.getElementById(i);let tok='',max=0,key=null;
+const say=(id,t,e)=>{$(id).textContent=t;$(id).className='m'+(e?' e':'')};
+const api=(u,m,b)=>fetch(u,{method:m||'GET',headers:{Authorization:'Bearer '+tok,'Content-Type':'application/json'},body:b?JSON.stringify(b):undefined});
+const LBL={pending:'Awaiting payment',delivering:'Sending',delivered:'Order placed',delivery_failed:'Needs manual send',amount_mismatch:'Amount mismatch'};
+const el=(t,c,x)=>{const n=document.createElement(t);if(c)n.className=c;if(x!=null)n.textContent=x;return n};
+const cedi=n=>'GH₵'+(Number.isInteger(n)?n:Number(n).toFixed(2));
+
+async function load(){
+  const ol=$('ol');ol.textContent='Loading...';
+  try{
+    const r=await api('/api/admin/orders');const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Failed');
+    const L=d.orders,paid=L.filter(o=>o.status==='delivered'),bad=L.filter(o=>o.status==='delivery_failed'||o.status==='amount_mismatch');
+    const sm=$('sm');sm.textContent='';
+    [[paid.length,'Delivered'],[cedi(paid.reduce((s,o)=>s+o.price,0)),'Sales (delivered)'],[bad.length,'Need attention'],[L.filter(o=>o.status==='pending').length,'Awaiting payment']].forEach(([v,l])=>{const b=el('div');b.append(el('b',0,v),el('span',0,l));sm.append(b)});
+    ol.textContent='';
+    if(!L.length){ol.append(el('div','empty','No orders yet.'));return}
+    L.forEach(o=>{
+      const c=el('div','o'+(o.status==='delivery_failed'?' bad':''));
+      const top=el('div','top');top.append(el('b',0,o.gb+'GB · '+cedi(o.price)),el('span','pill '+o.status,LBL[o.status]||o.status));
+      c.append(top,el('div','sm',o.phone+' · '+new Date(o.createdAt).toLocaleString()),el('div','sm',o.ref+(o.datamartRef?' · DM '+o.datamartRef:'')));
+      if(o.status==='delivery_failed'){c.append(el('div','fix','Paid but not delivered. Send '+o.gb+'GB MTN to '+o.phone+' manually.'));const mk=el('button','mk','Mark as sent');mk.onclick=()=>markSent(o,mk);c.append(mk)}
+      if(o.manual)c.append(el('div','sm','Sent manually'));
+      if(o.error)c.append(el('div','sm',o.error));
+      ol.append(c);
+    });
+  }catch(e){ol.textContent='';ol.append(el('div','empty e',e.message))}
+}
+
+async function markSent(o,b){if(!confirm('Confirm you sent '+o.gb+'GB to '+o.phone+'? The customer will see this order as placed.'))return;b.disabled=true;
+  try{const r=await api('/api/admin/orders','POST',{ref:o.ref});const d=await r.json();if(!r.ok)throw new Error(d.error||'Failed');load()}catch(e){alert(e.message);b.disabled=false}}
+$('c').onclick=async()=>{tok=$('t').value.trim();say('m0','Checking...');
+  const r=await api('/api/admin/withdraw');const d=await r.json().catch(()=>({}));
+  if(!r.ok){say('m0',d.error||'Failed',1);return}
+  max=d.max;$('d').textContent='Withdrawals go to '+d.name+', MTN '+d.destination+'. Max GH₵'+max+' each.';
+  $('w').hidden=false;say('m0','');load()};
+$('rf').onclick=load;
+$('a').oninput=()=>{key=null};
+$('s').onclick=async()=>{const amt=Number($('a').value);
+  if(!(amt>=1)||amt>max){say('m','Enter an amount between 1 and '+max,1);return}
+  if(!confirm('Withdraw GH₵'+amt.toFixed(2)+'? DataMart charges a fee on top.'))return;
+  key=key||crypto.randomUUID();$('s').disabled=true;say('m','Sending...');
+  try{const r=await api('/api/admin/withdraw','POST',{amount:amt,idemKey:key});const d=await r.json();
+    if(!r.ok)throw new Error(d.error||'Failed');
+    say('m','Status: '+d.status+'\nReference: '+d.reference+'\nFee: GH₵'+d.fee+'\nTotal taken: GH₵'+d.totalCharged+'\nWallet balance: GH₵'+d.balanceAfter);key=null;$('a').value='';
+  }catch(e){say('m',e.message+'\nIf unsure, check your DataMart withdrawals list before trying again.',1)}
+  $('s').disabled=false};
+</script></body></html>
+
 
