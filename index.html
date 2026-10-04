@@ -1,46 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#050505">
+<title>Nirvana Hub | Browse all night</title>
+<meta name="description" content="Cheap MTN data bundles in Ghana. Pick a bundle, enter your number, pay, browse.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@500;700;900&family=DM+Sans:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#050505;--ch:#151517;--ln:#2a2a2e;--gold:#ffc93c;--tx:#f6f4ee;--mu:#9b9a94;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+html{scroll-behavior:smooth;scroll-padding-top:env(safe-area-inset-top,0px);-webkit-text-size-adjust:100%}
+*,*::before,*::after{box-sizing:inherit}
+body{margin:0;background:var(--bg);color:var(--tx);font:400 16px/1.5 "DM Sans",system-ui,sans-serif;overflow-x:hidden;-webkit-tap-highlight-color:transparent}
+h1,h2,h3,.d{font-family:Unbounded,"DM Sans",system-ui,sans-serif;margin:0}
+#gl{position:fixed;inset:0;width:100%;height:100%;z-index:0;pointer-events:none}
+main,header,footer{position:relative;z-index:1}
+header{position:fixed;top:0;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:calc(12px + env(safe-area-inset-top,0px)) 18px 12px;background:linear-gradient(#050505e6,#05050500)}
+.logo{font:900 15px Unbounded,sans-serif;letter-spacing:.02em}.logo b{color:var(--gold)}
+.pill{font:700 13px "DM Sans",sans-serif;color:#050505;background:var(--gold);padding:9px 16px;border-radius:99px;text-decoration:none}
+.hero{min-height:100svh;display:flex;flex-direction:column;justify-content:flex-end;padding:0 20px 44px;touch-action:pan-y;position:relative}
+.hero h1{font-size:clamp(40px,13.5vw,76px);line-height:.95;font-weight:900;letter-spacing:-.03em;will-change:transform}
+.hero h1 span{display:block;color:var(--gold)}
+.hero p{max-width:30ch;color:var(--mu);margin:16px 0 22px}
+.hint{font-size:12px;color:var(--mu);margin-top:14px}
+.btn{display:inline-block;border:0;cursor:pointer;font:700 15px "DM Sans",sans-serif;background:var(--gold);color:#050505;padding:15px 22px;border-radius:14px;text-decoration:none;transition:transform .15s}
+.btn:active{transform:scale(.96)}
+.btn.g{background:transparent;color:var(--tx);border:1px solid var(--ln)}
+.tick{overflow:hidden;white-space:nowrap;background:var(--gold);color:#050505;padding:11px 0;transform:rotate(-1.5deg);margin:0 -10px}
+.tick div{display:inline-block;animation:tk 22s linear infinite;font:900 14px Unbounded,sans-serif}
+@keyframes tk{to{transform:translateX(-50%)}}
+section{padding:72px 18px 0}
+h2{font-size:clamp(26px,8vw,40px);font-weight:900;letter-spacing:-.02em;line-height:1.05}
+.sub{color:var(--mu);margin:10px 0 26px;max-width:36ch}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.card{background:#151517f2;border:1px solid var(--ln);border-radius:22px;padding:16px;display:flex;flex-direction:column;gap:4px;transform-style:preserve-3d}
+.card .gb{font:900 34px/1 Unbounded,sans-serif}.card .gb small{font-size:15px;color:var(--mu);font-weight:500}
+.card .nm{font-size:13px;color:var(--mu);min-height:20px}
+.card .pr{font:700 18px Unbounded,sans-serif;color:var(--gold);margin:8px 0 12px}
+.card .btn{padding:12px;text-align:center;font-size:13px;margin-top:auto}
+.card.f{grid-column:1/-1;background:linear-gradient(145deg,#2a2208f5,#151517f5 60%);border-color:var(--gold);box-shadow:0 0 40px #ffc93c26;padding:22px}
+.card.f .gb{font-size:60px}.card.f .pr{font-size:26px}
+.tag{align-self:flex-start;font:700 12px "DM Sans",sans-serif;background:var(--gold);color:#050505;padding:4px 10px;border-radius:99px;margin-bottom:8px}
+.steps{display:grid;gap:12px;counter-reset:s}
+.step{display:flex;gap:16px;align-items:center;background:#151517f2;border:1px solid var(--ln);border-radius:20px;padding:16px 18px;counter-increment:s}
+.step::before{content:counter(s);font:900 22px Unbounded,sans-serif;color:var(--gold);min-width:28px}
+.step b{display:block;font-size:17px}.step span{color:var(--mu);font-size:14px}
+.why{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.why div{background:#151517f2;border:1px solid var(--ln);border-radius:20px;padding:18px 16px;font:700 15px/1.25 Unbounded,sans-serif}
+.why div span{display:block;font:400 13px/1.4 "DM Sans",sans-serif;color:var(--mu);margin-top:8px}
+footer{padding:80px 18px calc(40px + env(safe-area-inset-bottom,0px));text-align:center}
+footer .big{font:900 clamp(26px,9vw,44px)/1 Unbounded,sans-serif;margin-bottom:20px}
+footer small{display:block;color:var(--mu);margin-top:22px;font-size:12px}
+.rv{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
+.rs .box{border:1px solid var(--gold);border-radius:24px;padding:26px 20px;background:linear-gradient(145deg,#2a2208f5,#151517f5 65%);box-shadow:0 0 40px #ffc93c1f}
+.rs .btn{display:block;text-align:center;width:100%;font-size:16px;padding:17px}
+/* sheet */
+#ov{position:fixed;inset:0;z-index:20;background:#000000b3;opacity:0;pointer-events:none;transition:opacity .25s}
+#ov.on{opacity:1;pointer-events:auto}
+#sh{position:absolute;left:0;right:0;bottom:0;background:var(--ch);border-top:1px solid var(--gold);border-radius:26px 26px 0 0;padding:22px 20px calc(24px + env(safe-area-inset-bottom,0px));transform:translateY(100%);transition:transform .35s cubic-bezier(.2,.9,.2,1)}
+#ov.on #sh{transform:none}
+#sh .row{display:flex;justify-content:space-between;align-items:center;margin-bottom:18px}
+#sh .x{background:none;border:0;color:var(--mu);font-size:26px;cursor:pointer;padding:4px 8px}
+.sum{background:#050505;border:1px solid var(--ln);border-radius:16px;padding:14px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:16px}
+.sum b{font:900 22px Unbounded,sans-serif}.sum span{font-size:13px;color:var(--mu);display:block}.sum i{font:700 20px Unbounded,sans-serif;color:var(--gold);font-style:normal}
+label{font-size:13px;color:var(--mu);display:block;margin-bottom:6px}
+input{width:100%;font:500 20px "DM Sans",sans-serif;letter-spacing:.04em;background:#050505;color:var(--tx);border:1px solid var(--ln);border-radius:14px;padding:15px 16px}
+input:focus{outline:2px solid var(--gold);outline-offset:1px}
+.msg{min-height:22px;font-size:13px;margin:10px 0 12px;color:#ff8a7a}.msg.ok{color:var(--gold)}
+#sh .btn{width:100%}
+.btn:focus-visible,.pill:focus-visible,.x:focus-visible{outline:2px solid #fff;outline-offset:3px}
+.nogl #gl{display:none}.nogl body{background:radial-gradient(circle at 50% 30%,#3a2d08,#050505 60%)}
+@media (prefers-reduced-motion:reduce){.tick div{animation:none}.rv{opacity:1;transform:none;transition:none}html{scroll-behavior:auto}}
+</style>
+</head>
+<body>
+<canvas id="gl" aria-hidden="true"></canvas>
+<header><div class="logo">NIRVANA <b>HUB</b></div><a class="pill" href="#bundles">Buy data</a></header>
+<main>
+<div class="hero" id="hero">
+  <h1><span style="color:var(--tx)">Browse</span><span style="color:var(--tx)">all</span><span>night.</span></h1>
+  <p>MTN data bundles for Ghana. Pick one, pay, and keep scrolling.</p>
+  <div><a class="btn" href="#bundles">See bundles</a> <a class="btn g" href="#how">How it works</a></div>
+  <div class="hint">Drag the orb. It likes attention.</div>
+</div>
+<div class="tick" aria-hidden="true"><div id="tk"></div></div>
 
-NIRVANA HUB
-Buy data
-Browse
-all
-night.
-MTN data bundles for Ghana. Pick one, pay, and keep scrolling.
-See bundles How it works
-Drag the orb. It likes attention.
+<section id="bundles">
+  <h2 class="rv">Pick your data.</h2>
+  <p class="sub rv">All MTN. Prices in Ghana cedis. Tap a bundle to buy.</p>
+  <div class="grid" id="grid"></div>
+</section>
 
-Pick your data.
-All MTN. Prices in Ghana cedis. Tap a bundle to buy.
-How it works
-Four taps. No queues.
-Choose bundle
-Find the size that fits your week.
-Enter number
-Your MTN number, nothing else.
-Pay
-Secure checkout with Paystack.
-Browse
-Data lands on your line. Go all night.
-Why Nirvana Hub
+<section id="how">
+  <h2 class="rv">How it works</h2>
+  <p class="sub rv">Four taps. No queues.</p>
+  <div class="steps">
+    <div class="step rv"><div><b>Choose bundle</b><span>Find the size that fits your week.</span></div></div>
+    <div class="step rv"><div><b>Enter number</b><span>Your MTN number, nothing else.</span></div></div>
+    <div class="step rv"><div><b>Pay</b><span>Secure checkout with Paystack.</span></div></div>
+    <div class="step rv"><div><b>Browse</b><span>Data lands on your line. Go all night.</span></div></div>
+  </div>
+</section>
 
-Fast Delivery
-Bundles sent straight to your number.
-MTN Data
-Real MTN bundles, every size.
-Easy Payment
-Mobile-friendly checkout.
-Browse All Night
-Stream, scroll, study, repeat.
-Become a reseller.
-Sell MTN data to your own customers with Nirvana Hub. Message us and we will set you up.
-Become a Reseller
-Nirvana Hub.
-Browse all night.
-Chat on WhatsApp
-Accra, Ghana. Nirvana Hub is an independent reseller of MTN data.
-Buy data
-×
+<section>
+  <h2 class="rv">Why Nirvana Hub</h2>
+  <p class="sub rv"></p>
+  <div class="why">
+    <div class="rv">Fast Delivery<span>Bundles sent straight to your number.</span></div>
+    <div class="rv">MTN Data<span>Real MTN bundles, every size.</span></div>
+    <div class="rv">Easy Payment<span>Mobile-friendly checkout.</span></div>
+    <div class="rv">Browse All Night<span>Stream, scroll, study, repeat.</span></div>
+  </div>
+</section>
+<section class="rs">
+  <div class="box rv">
+    <h2>Become a reseller.</h2>
+    <p class="sub">Sell MTN data to your own customers with Nirvana Hub. Message us and we will set you up.</p>
+    <a class="btn" href="https://wa.me/233559212591?text=Hi%20Nirvana%20Hub%2C%20I%20want%20to%20become%20a%20reseller.">Become a Reseller</a>
+  </div>
+</section>
+</main>
+<footer>
+  <div class="big">Nirvana Hub.<br>Browse all night.</div>
+  <a class="btn" href="https://wa.me/233559212591">Chat on WhatsApp</a>
+  <small>Accra, Ghana. Nirvana Hub is an independent reseller of MTN data.</small>
+</footer>
 
+<div id="ov" role="dialog" aria-modal="true" aria-labelledby="st">
+  <div id="sh">
+    <div class="row"><h3 id="st" style="font-size:18px">Buy data</h3><button class="x" id="cl" aria-label="Close">&times;</button></div>
+    <div class="sum"><div><b id="sg"></b><span id="sn"></span></div><i id="sp"></i></div>
+    <label for="ph">MTN number</label>
+    <input id="ph" type="tel" inputmode="numeric" autocomplete="tel-national" placeholder="024 000 0000" maxlength="13">
+    <div class="msg" id="mg" role="status"></div>
+    <button class="btn" id="go">Continue to Payment</button>
+  </div>
+</div>
 
-MTN number
+<script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+<script>
+/* ===== CONFIG =====
+   Paystack + your DataMart API key must live on a SERVER (e.g. a Netlify Function), never in this file.
+   Set PAY_ENDPOINT to that function's URL. It should accept {gb, price, phone}, create the Paystack
+   transaction, and return {authorization_url}. Until it is set, checkout shows a "not live" notice. */
+const PAY_ENDPOINT = "";
 
-Continue to Payment
+const B=[[1,5.9,'Chop Chop Bundle'],[2,10,'Flexi Bundle'],[3,15,'Girlfriend Bundle'],[4,20,'Student Bundle'],[5,25,'Mowing Bundle'],[6,28,'Night Bundle'],[8,36],[10,45,'Nepo Baby Bundle'],[15,65],[20,85,'Dbee Bundle'],[25,110,'Browsers Bundle'],[30,135,'Movie Bundle'],[40,170],[50,230]];
+const fmt=p=>'GH₵'+(Number.isInteger(p)?p:p.toFixed(2));
+const $=id=>document.getElementById(id);
+const grid=$('grid');
+const card=(b,f)=>`<div class="card rv${f?' f':''}">${f?'<span class="tag">Featured</span>':''}<div class="gb">${b[0]}<small>GB</small></div><div class="nm">${b[2]||'MTN data'}</div><div class="pr">${fmt(b[1])}</div><button class="btn" data-i="${B.indexOf(b)}">BUY NOW</button></div>`;
+const feat=B.find(b=>b[0]==20);
+grid.innerHTML=card(feat,1)+B.filter(b=>b!==feat).map(b=>card(b)).join('');
+$('tk').innerHTML=('BROWSE ALL NIGHT &nbsp;★&nbsp; '.repeat(10));
+
+/* reveal */
+const io=new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting){e.target.classList.add('in');io.unobserve(e.target)}}),{threshold:.12});
+document.querySelectorAll('.rv').forEach(el=>io.observe(el));
+
+/* checkout sheet */
+let cur=null;const ov=$('ov'),ph=$('ph'),mg=$('mg'),go=$('go');
+const say=(t,ok)=>{mg.textContent=t;mg.className='msg'+(ok?' ok':'')};
+grid.addEventListener('click',e=>{const bt=e.target.closest('button[data-i]');if(!bt)return;cur=B[bt.dataset.i];
+  $('sg').textContent=cur[0]+'GB';$('sn').textContent=cur[2]||'MTN data';$('sp').textContent=fmt(cur[1]);
+  say('');ov.classList.add('on');setTimeout(()=>ph.focus(),350)});
+const close=()=>{ov.classList.remove('on');ph.blur()};
+$('cl').onclick=close;ov.addEventListener('click',e=>{if(e.target===ov)close()});
+addEventListener('keydown',e=>{if(e.key==='Escape')close()});
+const MTN=/^0(24|25|53|54|55|59)\d{7}$/;
+go.onclick=async()=>{
+  const n=ph.value.replace(/\D/g,'').replace(/^233/,'0');
+  if(!MTN.test(n)){say('Enter a valid MTN number, like 024 000 0000.');return}
+  if(!PAY_ENDPOINT){say('Checkout is not live yet. Payments open once Paystack is connected.');return}
+  go.disabled=true;say('Opening secure checkout...',1);
+  try{const r=await fetch(PAY_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gb:cur[0],price:cur[1],phone:n})});
+    const d=await r.json();if(!r.ok||!d.authorization_url)throw 0;location.href=d.authorization_url;
+  }catch(_){say('Could not start payment. Check your connection and try again.')}
+  go.disabled=false};
+
+/* 3D scene */
+(function(){
+const cv=$('gl');let R;
+try{R=new THREE.WebGLRenderer({canvas:cv,antialias:true,alpha:true,powerPreference:'high-performance'})}catch(e){document.documentElement.classList.add('nogl');return}
+R.setPixelRatio(Math.min(devicePixelRatio||1,2));
+const S=new THREE.Scene(),C=new THREE.PerspectiveCamera(50,1,.1,50);C.position.z=5.2;
+const G=new THREE.Group();S.add(G);
+const U={t:{value:0}};
+const core=new THREE.Mesh(new THREE.SphereGeometry(1,48,48),new THREE.ShaderMaterial({uniforms:U,
+ vertexShader:'varying vec3 n,v;void main(){n=normalize(normalMatrix*normal);vec4 m=modelViewMatrix*vec4(position,1.);v=normalize(-m.xyz);gl_Position=projectionMatrix*m;}',
+ fragmentShader:'uniform float t;varying vec3 n,v;void main(){float f=pow(1.-max(dot(n,v),0.),2.2);float w=.5+.5*sin(t*1.6+n.y*5.);vec3 c=mix(vec3(.12,.08,0.),vec3(1.,.79,.24),f);gl_FragColor=vec4(c*(.55+f*1.4+w*.25),1.);}'}));
+G.add(core);
+const wire=new THREE.Mesh(new THREE.IcosahedronGeometry(1.32,2),new THREE.MeshBasicMaterial({color:0xffc93c,wireframe:true,transparent:true,opacity:.28}));G.add(wire);
+const ring=new THREE.Mesh(new THREE.TorusGeometry(1.85,.012,8,120),new THREE.MeshBasicMaterial({color:0xfff2c2,transparent:true,opacity:.7}));ring.rotation.x=1.2;G.add(ring);
+const N=innerWidth<500?650:1100,pos=new Float32Array(N*3);
+for(let i=0;i<N;i++){const r=2.2+Math.random()*5,a=Math.random()*6.283,b=Math.acos(2*Math.random()-1);pos.set([r*Math.sin(b)*Math.cos(a),r*Math.sin(b)*Math.sin(a),r*Math.cos(b)],i*3)}
+const pg=new THREE.BufferGeometry();pg.setAttribute('position',new THREE.BufferAttribute(pos,3));
+const pts=new THREE.Points(pg,new THREE.PointsMaterial({color:0xffd66b,size:.03,transparent:true,opacity:.85,depthWrite:false,blending:THREE.AdditiveBlending}));S.add(pts);
+
+let W=0;const fit=()=>{if(innerWidth===W&&W)return;W=innerWidth;R.setSize(innerWidth,innerHeight,false);C.aspect=innerWidth/innerHeight;C.updateProjectionMatrix()};
+fit();addEventListener('resize',fit);
+
+/* drag in hero (horizontal swipes spin the orb, vertical still scrolls) */
+let vx=0,vy=0,drag=false,lx=0,ly=0;const hero=$('hero');
+hero.addEventListener('pointerdown',e=>{drag=true;lx=e.clientX;ly=e.clientY});
+addEventListener('pointermove',e=>{if(!drag)return;vy+=(e.clientX-lx)*.0016;vx+=(e.clientY-ly)*.0008;lx=e.clientX;ly=e.clientY});
+['pointerup','pointercancel'].forEach(t=>addEventListener(t,()=>drag=false));
+
+let sp=0,tgt=0;addEventListener('scroll',()=>{tgt=scrollY},{passive:true});
+const calm=matchMedia('(prefers-reduced-motion:reduce)').matches;
+const h1=document.querySelector('.hero h1');
+let last=performance.now(),run=true;
+document.addEventListener('visibilitychange',()=>{run=!document.hidden;if(run){last=performance.now();loop()}});
+function loop(){if(!run)return;requestAnimationFrame(loop);
+ const now=performance.now(),dt=Math.min((now-last)/1000,.05);last=now;
+ U.t.value+=dt;sp+=(tgt-sp)*.08;
+ const p=Math.min(sp/innerHeight,3);
+ G.rotation.y+=(calm?.001:.004)+vy;G.rotation.x+=vx;vx*=.92;vy*=.92;G.rotation.x*=.995;
+ ring.rotation.z+=dt*.5;wire.rotation.y-=dt*.15;
+ const k=Math.max(1-p*.55,.45);G.scale.setScalar(k);
+ G.position.y=1.15-p*1.1;G.position.x=Math.sin(p*2.2)*1.1;
+ pts.rotation.y+=dt*.02;pts.position.y=sp*.0016;
+ C.position.z=5.2+Math.sin(p*1.5)*.6;
+ const pulse=1+Math.sin(U.t.value*2)*.015;core.scale.setScalar(pulse);
+ if(!calm)h1.style.transform='translate3d(0,'+(-sp*.12).toFixed(1)+'px,0)';
+ R.render(S,C)}
+loop();
+})();
+</script>
+</body>
+</html>
+
