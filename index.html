@@ -56,6 +56,9 @@ footer small{display:block;color:var(--mu);margin-top:22px;font-size:12px}
 .rv{opacity:0;transform:translateY(26px);transition:opacity .7s,transform .7s cubic-bezier(.2,.8,.2,1)}.rv.in{opacity:1;transform:none}
 .rs .box{border:1px solid var(--gold);border-radius:24px;padding:26px 20px;background:linear-gradient(145deg,#2a2208f5,#151517f5 65%);box-shadow:0 0 40px #ffc93c1f}
 .rs .btn{display:block;text-align:center;width:100%;font-size:16px;padding:17px}
+#track .box{border:1px solid var(--ln);border-radius:22px;padding:20px 18px;background:#151517f2}
+#track .btn{width:100%;margin-top:12px}
+#to{margin-top:14px;min-height:24px;color:var(--gold);font-weight:700}
 /* sheet */
 #ov{position:fixed;inset:0;z-index:20;background:#000000b3;opacity:0;pointer-events:none;transition:opacity .25s}
 #ov.on{opacity:1;pointer-events:auto}
@@ -78,6 +81,7 @@ input:focus{outline:2px solid var(--gold);outline-offset:1px}
 <body>
 <canvas id="gl" aria-hidden="true"></canvas>
 <header><div class="logo">NIRVANA <b>HUB</b></div><a class="pill" href="#bundles">Buy data</a></header>
+<div id="bn" role="status" style="display:none;position:fixed;left:12px;right:12px;top:calc(64px + env(safe-area-inset-top,0px));z-index:6;background:#ffc93c;color:#050505;font:700 14px/1.35 'DM Sans',sans-serif;padding:12px 14px;border-radius:14px"></div>
 <main>
 <div class="hero" id="hero">
   <h1><span style="color:var(--tx)">Browse</span><span style="color:var(--tx)">all</span><span>night.</span></h1>
@@ -114,6 +118,15 @@ input:focus{outline:2px solid var(--gold);outline-offset:1px}
     <div class="rv">Browse All Night<span>Stream, scroll, study, repeat.</span></div>
   </div>
 </section>
+<section id="track">
+  <h2 class="rv">Track your order</h2>
+  <p class="sub rv">Enter the reference you got at checkout. It starts with NH-.</p>
+  <div class="box rv">
+    <input id="tr" placeholder="NH-XXXXXXXX-XXXXX" autocapitalize="characters" autocomplete="off" aria-label="Order reference">
+    <button class="btn" id="tb" type="button">Track order</button>
+    <div id="to" role="status"></div>
+  </div>
+</section>
 <section class="rs">
   <div class="box rv">
     <h2>Become a reseller.</h2>
@@ -145,7 +158,7 @@ input:focus{outline:2px solid var(--gold);outline-offset:1px}
    Paystack + your DataMart API key must live on a SERVER (e.g. a Netlify Function), never in this file.
    Set PAY_ENDPOINT to that function's URL. It should accept {gb, price, phone}, create the Paystack
    transaction, and return {authorization_url}. Until it is set, checkout shows a "not live" notice. */
-const PAY_ENDPOINT = "";
+const PAY_ENDPOINT = "/api/pay";
 
 const B=[[1,5.9,'Chop Chop Bundle'],[2,10,'Flexi Bundle'],[3,15,'Girlfriend Bundle'],[4,20,'Student Bundle'],[5,25,'Mowing Bundle'],[6,28,'Night Bundle'],[8,36],[10,45,'Nepo Baby Bundle'],[15,65],[20,85,'Dbee Bundle'],[25,110,'Browsers Bundle'],[30,135,'Movie Bundle'],[40,170],[50,230]];
 const fmt=p=>'GH₵'+(Number.isInteger(p)?p:p.toFixed(2));
@@ -176,7 +189,7 @@ go.onclick=async()=>{
   if(!PAY_ENDPOINT){say('Checkout is not live yet. Payments open once Paystack is connected.');return}
   go.disabled=true;say('Opening secure checkout...',1);
   try{const r=await fetch(PAY_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gb:cur[0],price:cur[1],phone:n})});
-    const d=await r.json();if(!r.ok||!d.authorization_url)throw 0;location.href=d.authorization_url;
+    const d=await r.json();if(!r.ok||!d.authorization_url)throw 0;try{localStorage.setItem("nh_ref",d.reference)}catch(_){}location.href=d.authorization_url;
   }catch(_){say('Could not start payment. Check your connection and try again.')}
   go.disabled=false};
 
@@ -228,6 +241,27 @@ function loop(){if(!run)return;requestAnimationFrame(loop);
  R.render(S,C)}
 loop();
 })();
+
+/* payment status after Paystack redirects back (?ref=...) */
+(async()=>{const ref=new URLSearchParams(location.search).get('ref');if(!ref||!PAY_ENDPOINT)return;
+ const bn=$('bn'),T={pending:'Waiting for payment confirmation...',delivering:'Payment received. Sending your data...',delivered:'Order placed. Your data is on its way. It can take a little while to land, so sit tight.',delivery_failed:'Payment received, but delivery needs a manual check. WhatsApp us with reference '+ref+'.',amount_mismatch:'Payment amount did not match. WhatsApp us with reference '+ref+'.',unknown:'We could not find that order. WhatsApp us with reference '+ref+'.'};
+ bn.style.display='block';
+ for(let i=0;i<10;i++){try{const r=await fetch('/api/order-status?ref='+encodeURIComponent(ref));const d=await r.json();bn.textContent=T[d.status]||T.unknown;if(!['pending','delivering'].includes(d.status))return}catch(_){}await new Promise(r=>setTimeout(r,4000))}
+ bn.textContent='Still confirming. If you paid, your data will arrive shortly. Reference '+ref+'.'})();
+/* live order tracker */
+(()=>{if(!PAY_ENDPOINT)return;const inp=$('tr'),out=$('to');let timer=0;
+ const S={pending:'Waiting for payment confirmation...',delivering:'Payment received. Sending your data...',delivered:'Order placed. Your data is on its way. It can take a little while to land.',delivery_failed:'Payment received, but delivery needs a manual check. WhatsApp us with this reference.',amount_mismatch:'Payment amount did not match. WhatsApp us with this reference.',unknown:'We could not find that order. Check the reference and try again.'};
+ async function track(ref,n){clearTimeout(timer);ref=ref.trim().toUpperCase();
+  if(!/^NH-[A-Z0-9-]+$/.test(ref)){out.textContent='Enter a reference that starts with NH-.';return}
+  if(!n)out.textContent='Checking...';
+  try{const r=await fetch('/api/order-status?ref='+encodeURIComponent(ref));const d=await r.json();out.textContent=S[d.status]||S.unknown;
+   if((d.status==='pending'||d.status==='delivering')&&(n||0)<30)timer=setTimeout(()=>track(ref,(n||0)+1),5000)}
+  catch(_){out.textContent='Could not check right now. Try again.'}}
+ $('tb').onclick=()=>track(inp.value,0);
+ inp.addEventListener('keydown',e=>{if(e.key==='Enter')track(inp.value,0)});
+ let saved='';try{saved=localStorage.getItem('nh_ref')||''}catch(_){}
+ const ref=new URLSearchParams(location.search).get('ref')||saved;
+ if(ref){inp.value=ref;if(new URLSearchParams(location.search).get('ref'))track(ref,0)}})();
 </script>
 </body>
 </html>
