@@ -189,8 +189,8 @@ go.onclick=async()=>{
   if(!PAY_ENDPOINT){say('Checkout is not live yet. Payments open once Paystack is connected.');return}
   go.disabled=true;say('Opening secure checkout...',1);
   try{const r=await fetch(PAY_ENDPOINT,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({gb:cur[0],price:cur[1],phone:n})});
-    const d=await r.json();if(!r.ok||!d.authorization_url)throw 0;try{localStorage.setItem("nh_ref",d.reference)}catch(_){}location.href=d.authorization_url;
-  }catch(_){say('Could not start payment. Check your connection and try again.')}
+    const d=await r.json().catch(()=>({error:'Payment service not found (HTTP '+r.status+'). The backend may not be deployed.'}));if(!r.ok||!d.authorization_url)throw new Error(d.error||'unknown');try{localStorage.setItem("nh_ref",d.reference)}catch(_){}location.href=d.authorization_url;
+  }catch(e){say(e.name==='TypeError'?'No connection. Check your internet and try again.':'Could not start payment. '+(e.message||''))}
   go.disabled=false};
 
 /* 3D scene */
@@ -265,4 +265,3 @@ loop();
 </script>
 </body>
 </html>
-
